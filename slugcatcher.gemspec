@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Rui Freitas"]
   spec.email         = ["dinnerpartysaboteur@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because RubyGems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Dynamic slugs lookup for Rails.}
+  spec.description   = %q{With Slugcatcher, you can mark your models for dynamic url slug matching and lookup.}
+  spec.homepage      = "https://github.com/rodloboz/slugcatcher"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
