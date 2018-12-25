@@ -12,14 +12,24 @@ module Slugcatcher
     def self.define_dictionary_methods(name)
       dictionary_name = "#{name.pluralize}_dictionary"
 
-      define_method(dictionary_name) do
-        dictionary = build_dictionary(name)
-        instance_variable_set("@#{dictionary_name}", dictionary)
-      end
+      class_eval %{
+        def #{dictionary_name}
+          @#{dictionary_name} ||= build_dictionary(:#{name})
+        end
 
-      define_method("#{name}?") do |term|
-        send(dictionary_name).key?(term)
-      end
+        def #{name}?(term)
+          #{dictionary_name}.key?(term)
+        end
+      }
+
+      # define_method(dictionary_name) do
+      #   dictionary = instance_variable_get("@#{dictionary_name}") ||= build_dictionary(name)
+      #   instance_variable_set("@#{dictionary_name}", dictionary)
+      # end
+
+      # define_method("#{name}?") do |term|
+      #   send(dictionary_name).key?(term)
+      # end
     end
 
     def dictionaries
