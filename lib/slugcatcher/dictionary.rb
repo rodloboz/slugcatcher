@@ -2,9 +2,7 @@ module Slugcatcher
   class Dictionary
     def initialize(models)
       @names = models.map { |m| m.name.underscore}
-      @names.each do |name|
-        Dictionary.define_dictionary_methods(name)
-      end
+      @names.each { |name| Dictionary.define_dictionary_methods(name) }
     end
 
     def slug_dictionary
@@ -15,7 +13,8 @@ module Slugcatcher
       dictionary_name = "#{name.pluralize}_dictionary"
 
       define_method(dictionary_name) do
-        instance_variable_set("@#{dictionary_name}", build_dictionary(name))
+        dictionary = build_dictionary(name)
+        instance_variable_set("@#{dictionary_name}", dictionary)
       end
 
       define_method("#{name}?") do |term|
@@ -28,7 +27,6 @@ module Slugcatcher
     end
 
     private
-
 
     def build_dictionary(name)
       puts "building dictionary"
