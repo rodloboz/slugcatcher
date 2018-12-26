@@ -41,7 +41,7 @@ module Slugcatcher
     def build_dictionary(name)
       puts "building dictionary"
       dictionary = {}
-      klass = name.camelize.constantize
+      klass = name.to_s.camelize.constantize
       klass.pluck(:id, :name).each do |id, name|
         key = name.parameterize
         dictionary[key] = {id: id, text: name }
