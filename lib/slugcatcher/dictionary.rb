@@ -45,7 +45,7 @@ module Slugcatcher
 
     # merge hash dictionaries into single hash
     def slug_dictionary
-      dictionaries.map { |d| dic.send(d) }.reduce Hash.new, :merge
+      dictionaries.map { |d| send(d) }.reduce Hash.new, :merge
     end
 
     def build_dictionary(name)
