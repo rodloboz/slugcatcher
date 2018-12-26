@@ -14,6 +14,7 @@ module Slugcatcher
   class << self
     attr_accessor :models
   end
+
   self.models = []
 
   def self.lookup(slugs)

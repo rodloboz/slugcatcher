@@ -1,8 +1,5 @@
 require "bundler/setup"
 
-# Bundler.require :default, :development
-
-# require "rspec/rails"
 require "slugcatcher"
 
 RSpec.configure do |config|

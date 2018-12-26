@@ -1,28 +1,54 @@
 module Slugcatcher
   class Dictionary
+    attr_reader :names
+
     def initialize(models)
-      models.each do |model|
-        Dictionary.define_dictionary_methods(model)
-      end
+      @names = models.map { |m| m.name.underscore}
+      @names.each { |name| Dictionary.define_dictionary_methods(name) }
     end
 
-    def self.define_dictionary_methods(model)
-      attr_name = model.name.underscore
-      dictionary_name = "#{attr_name.pluralize}_dictionary"
+    def self.define_dictionary_methods(name)
+      dictionary_name = "#{name.pluralize}_dictionary"
 
-      define_method(dictionary_name) do
-        instance_variable_set("@#{dictionary_name}", build_dictionary(name))
-      end
+      class_eval %{
+        def #{dictionary_name}
+          @#{dictionary_name} ||= build_dictionary(:#{name})
+        end
 
-      define_method("#{attr_name}?") do |term|
-        send(dictionary_name).key?(term)
-      end
+        def #{name}?(term)
+          #{dictionary_name}.key?(term)
+        end
+      }
+    end
+
+    def ordered_terms
+      slug_dictionary.keys.sort_by { |slug| slug.length }.reverse!
+    end
+
+    def text(term)
+      slug_dictionary[term][:text]
+    end
+
+    def id(term)
+      slug_dictionary[term][:id]
+    end
+
+    def term(id)
+      slug_dictionary.each { |k, v| return v[:text] if v[:id] == id }
     end
 
     private
 
+    def dictionaries
+      @dictionaries ||= methods.grep /^.*_dictionary/
+    end
+
+    # merge hash dictionaries into single hash
+    def slug_dictionary
+      dictionaries.map { |d| dic.send(d) }.reduce Hash.new, :merge
+    end
+
     def build_dictionary(name)
-      puts "building dictionary"
       dictionary = {}
       klass = name.to_s.camelize.constantize
       klass.pluck(:id, :name).each do |id, name|
