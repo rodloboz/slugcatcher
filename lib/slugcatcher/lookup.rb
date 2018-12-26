@@ -1,20 +1,16 @@
 module Slugcatcher
   class Lookup
-    attr_reader :cuisines, :categories, :location
+    attr_reader :matches
 
     def initialize(models, slugs)
       @models = models
       @slugs = slugs.split('/')
-      @cuisines = []
-      @categories = []
-      @location = nil
+      @matches = Hash.new { |h, k| h[k] = [] }
     end
 
     def execute
-      @slugs.each do |slug|
-        lookup_slug(slug)
-      end
-      no_match? ? nil : { cuisines: cuisines, categories: categories, location: @location}
+      @slugs.each { |slug| lookup_slug(slug) }
+      no_match? ? nil : @matches
     end
 
     private
@@ -39,12 +35,10 @@ module Slugcatcher
       terms.each do |term|
         if slug_matches_term?(term, slug)
           remove_term_from_slug(term, slug)
-          if dictionary.location?(term)
-            location = dictionary.text(term)
-          elsif dictionary.cuisine?(term)
-            cuisines << dictionary.text(term)
-          elsif dictionary.category?(term)
-            categories << dictionary.text(term)
+          dictionary.names.each do |name|
+            if dictionary.send("#{name}?", term)
+              @matches[name.to_sym] << dictionary.text(term)
+            end
           end
         end
         break if slug.empty?
@@ -52,7 +46,7 @@ module Slugcatcher
     end
 
     def no_match?
-      cuisines.empty? && categories.empty? && location.nil?
+      @matches.empty?
     end
   end
 end
