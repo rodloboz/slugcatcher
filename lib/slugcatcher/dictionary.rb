@@ -3,16 +3,20 @@ module Slugcatcher
     attr_reader :names
 
     def initialize(models)
-      @names = models.map { |m| m.name.underscore}
-      @names.each { |name| Dictionary.define_dictionary_methods(name) }
+      @names = []
+      models.each do |model|
+        name = model[0].name.underscore
+        @names << name
+        Dictionary.define_dictionary_methods(name, model[1])
+      end
     end
 
-    def self.define_dictionary_methods(name)
+    def self.define_dictionary_methods(name, lookup)
       dictionary_name = "#{name.pluralize}_dictionary"
 
       class_eval %{
         def #{dictionary_name}
-          @#{dictionary_name} ||= build_dictionary(:#{name})
+          @#{dictionary_name} ||= build_dictionary(:#{name}, :#{lookup})
         end
 
         def #{name}?(term)
@@ -48,12 +52,12 @@ module Slugcatcher
       dictionaries.map { |d| send(d) }.reduce Hash.new, :merge
     end
 
-    def build_dictionary(name)
+    def build_dictionary(name, lookup)
       dictionary = {}
       klass = name.to_s.camelize.constantize
-      klass.pluck(:id, :name).each do |id, name|
-        key = name.parameterize
-        dictionary[key] = {id: id, text: name }
+      klass.pluck(:id, lookup.to_sym).each do |id, lookup|
+        key = lookup.parameterize
+        dictionary[key] = {id: id, text: lookup }
       end
       dictionary
     end

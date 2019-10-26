@@ -1,7 +1,7 @@
 module Slugcatcher
   module Model
-    def slugcatcher
-      Slugcatcher.models << self
+    def slugcatcher(options = {})
+      Slugcatcher.models << [self, options[:lookup] || :name]
     end
   end
 end
