@@ -56,6 +56,8 @@ module Slugcatcher
       dictionary = {}
       klass = name.to_s.camelize.constantize
       klass.pluck(:id, lookup.to_sym).each do |id, lookup|
+        next if lookup.nil?
+
         key = lookup.parameterize
         dictionary[key] = {id: id, text: lookup }
       end

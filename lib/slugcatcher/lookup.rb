@@ -43,6 +43,7 @@ module Slugcatcher
         end
         break if slug.empty?
       end
+      @matches.each { |k, v| @matches[k] = v.uniq }
     end
 
     def no_match?
